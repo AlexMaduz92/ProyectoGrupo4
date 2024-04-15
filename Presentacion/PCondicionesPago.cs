@@ -20,6 +20,8 @@ namespace Presentacion
             BtnGuardar.Click += BtnGuardar_Click;
             BtnModificar.Click += BtnModificar_Click;
             BtnEliminar.Click += BtnEliminar_Click;
+            CBXFiltro.SelectedIndexChanged += CBXFiltro_SelectedIndexChanged;
+            BtnCerrar.Click += BtnCerrar_Click;
         }
 
         private void PCondicionesPago_Load(object sender, EventArgs e)
@@ -38,6 +40,10 @@ namespace Presentacion
 
             // Asignar el DataView filtrado al DataGridView
             DGVCPago.DataSource = dv;
+
+            CBXFiltro.DropDownStyle = ComboBoxStyle.DropDownList;
+            CBXFiltro.Items.Add("Activos");
+            CBXFiltro.Items.Add("No Activos");
         }
 
         private int ObtenerProximoId()
@@ -182,6 +188,38 @@ namespace Presentacion
             }
         }
 
+        private void CargarDatosEstadoActivo()
+        {
+            // Crear una nueva vista de datos filtrada por Estado = true
+            DataView view = new DataView(this.proyectoRadDataSet4.CondiccionPagoes);
+            view.RowFilter = "Estado = true";
+            DGVCPago.DataSource = view;
+        }
+
+        private void CargarDatosEstadoNoActivo()
+        {
+            // Crear una nueva vista de datos filtrada por Estado = false
+            DataView view = new DataView(this.proyectoRadDataSet4.CondiccionPagoes);
+            view.RowFilter = "Estado = false";
+            DGVCPago.DataSource = view;
+        }
+
+        private void CBXFiltro_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // Obtener el filtro seleccionado
+            string filtro = CBXFiltro.SelectedItem.ToString();
+
+            // Actualizar el DataGridView según el filtro seleccionado
+            if (filtro == "Activos")
+            {
+                CargarDatosEstadoActivo();
+            }
+            else if (filtro == "No Activos")
+            {
+                CargarDatosEstadoNoActivo();
+            }
+        }
+
         private void LimpiarCampos()
         {
             TXTID.Text = string.Empty;
@@ -192,5 +230,10 @@ namespace Presentacion
             DTFCreacion.Value = DateTime.Now; // Puedes establecer otra fecha inicial si lo prefieres
         }
 
+
+        private void BtnCerrar_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
     }
 }

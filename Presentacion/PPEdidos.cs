@@ -1,6 +1,7 @@
 ﻿using Datos.Core;
 using Datos.Modelo;
 using System;
+using System.Data;
 using System.Windows.Forms;
 
 namespace Presentacion
@@ -15,12 +16,18 @@ namespace Presentacion
             unitOfWork = new UnitOfWork(); // Asumiendo que tienes una clase UnitOfWork para manejar las operaciones de base de datos
 
             BtnGuardar.Click += BtnGuardar_Click;
+            CBXFiltro.SelectedIndexChanged += CBXFiltro_SelectedIndexChanged;
+            BtnCerrar.Click += BtnCerrar_Click;
         }
 
         private void PPEdidos_Load(object sender, EventArgs e)
         {
             // TODO: esta línea de código carga datos en la tabla 'proyectoRadDataSet5.Pedidoes'. Puede moverla o quitarla según sea necesario.
             this.pedidoesTableAdapter.Fill(this.proyectoRadDataSet5.Pedidoes);
+
+            CBXFiltro.DropDownStyle = ComboBoxStyle.DropDownList;
+            CBXFiltro.Items.Add("Activos");
+            CBXFiltro.Items.Add("No Activos");
         }
 
         private void LimpiarCampos()
@@ -76,6 +83,37 @@ namespace Presentacion
             }
         }
 
+        private void CargarDatosEstadoActivo()
+        {
+            // Crear una nueva vista de datos filtrada por Estado = true
+            DataView view = new DataView(this.proyectoRadDataSet5.Pedidoes);
+            view.RowFilter = "Estado = true";
+            DGVPedidos.DataSource = view;
+        }
+
+        private void CargarDatosEstadoNoActivo()
+        {
+            // Crear una nueva vista de datos filtrada por Estado = false
+            DataView view = new DataView(this.proyectoRadDataSet5.Pedidoes);
+            view.RowFilter = "Estado = false";
+            DGVPedidos.DataSource = view;
+        }
+
+        private void CBXFiltro_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // Obtener el filtro seleccionado
+            string filtro = CBXFiltro.SelectedItem.ToString();
+
+            // Actualizar el DataGridView según el filtro seleccionado
+            if (filtro == "Activos")
+            {
+                CargarDatosEstadoActivo();
+            }
+            else if (filtro == "No Activos")
+            {
+                CargarDatosEstadoNoActivo();
+            }
+        }
 
         protected override void Dispose(bool disposing)
         {
@@ -88,6 +126,11 @@ namespace Presentacion
                 }
             }
             base.Dispose(disposing);
+        }
+
+        private void BtnCerrar_Click(object sender, EventArgs e)
+        {
+            this.Close();
         }
     }
 }
